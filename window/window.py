@@ -10,37 +10,25 @@ from physics.utils import unit_vector
 from .objects import background
 from .objects import ball
 
-def genBall(screen,windowSize):
+def genBall(screen,position):
 	randomColor = (
 		random.randint(20,255),
 		random.randint(20,255),
 		0,
 	)
 
-	ballToWindowScaleRatio = 1/100 # ratio ballSize : windowSize
-	ballSizeDeviation = 5/100 # percent
-
+	windowSize = screen.get_size()
 	minWindowDimension = min(windowSize)
 
 	# Radius
-	ballSize = minWindowDimension*ballToWindowScaleRatio
-	ballSize = ballSize + int(random.randint(-50,50)*ballSizeDeviation)
+	ballSize = minWindowDimension/75
 
-	# Position
-	position = np.array([
-					random.randint(ballSize,windowSize[0]-ballSize),
-					random.randint(ballSize,windowSize[1]-ballSize),
-	])
-	# position = np.array([
-	# 				10,
-	# 				10
-	# ])	
+	# Radius Deviation
+	ballSize = ballSize + int(random.randint(-50,50)*ballSize/200)
 
 	# Forces
-	baseVelocity = minWindowDimension/ballSize*.01
+	baseVelocity = 50
 	velocity = unit_vector(np.random.uniform(-1,1,2))*baseVelocity
-	# velocity = unit_vector(np.array([-1, 0]))*baseVelocity
-
 
 	acceleration = np.zeros(2)
 
@@ -73,25 +61,35 @@ class Window():
 		self.deltaTime = self.prevTime - self.prevTime
 
 	def objectsInit(self):
-		numBalls = 100
-		self.ballObjects = {f'ball_{i}' : genBall(self.screen,self.DISPLAY_WINDOW) for i in range(numBalls)}
 		self.objects = OrderedDict({
 			'screenBg' : background.Background(self.screen,color=(0x20,0x2A,0x44)),
-			**self.ballObjects,
+			
+			'ball0' : genBall(self.screen,np.array([100,100])),
+			'ball1' : genBall(self.screen,np.array([200,200])),
 		})
+
+		self.currBallIdx = 2
 
 	def keyEvents(self):
 		# All keys pressed, is a dictionary of bools of all keys
 		key=pygame.key.get_pressed()
 
+
 		# All Pygame Event handling
 		for event in pygame.event.get():
+
+			#Generate ball on mouseclick
+			if event.type == pygame.MOUSEBUTTONUP :
+				pos = pygame.mouse.get_pos()
+				self.objects[f'ball{self.currBallIdx}'] = genBall(self.screen,np.array(pos))
+				self.currBallIdx += 1
+
 			if event.type == pygame.QUIT:
 				self.gameLoopRunning = False
 
 	def updatePhysics(self):
-		allBalls = list(self.ballObjects.values())
-		deltaTimeDamp = 100.
+		allBalls = list( self.objects[objectName] for objectName in self.objects if objectName.startswith('ball'))
+		deltaTimeDamp = 1.
 		deltaTime = self.deltaTime.total_seconds()*deltaTimeDamp
 		updateVelocity(allBalls,deltaTime)
 		updatePosition(allBalls,deltaTime)

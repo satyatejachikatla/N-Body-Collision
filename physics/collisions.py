@@ -3,7 +3,7 @@ from physics.utils import length
 from window.objects.ball import Ball
 
 def detectBallToBallCollision(ball1: Ball,ball2: Ball):
-    if length(ball1-ball2) < ball1.radius + ball2.radius:
+    if length(ball1.position-ball2.position) < ball1.radius + ball2.radius:
         return True
     return False
 

@@ -9,9 +9,11 @@
 ## Running
 
 ```
-./envsetup/env.sh
+. ./envsetup/env.sh
 ./main.py
 ```
+
+![Balls](https://github.com/satyatejachikatla/N-Body-Collision/blob/main/res/balls.gif)
 
 ## Reference
 

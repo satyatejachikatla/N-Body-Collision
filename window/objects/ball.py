@@ -9,6 +9,8 @@ class Ball:
 		self.radius = radius
 		self.position = initPosition
 
+		self.mass = self.radius # Say mass proportional to radius
+
 		self.velocity = velocity
 		self.acceleration = acceleration
 
